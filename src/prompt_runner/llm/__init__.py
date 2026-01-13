@@ -10,6 +10,7 @@ from prompt_runner.llm.base import (
     LLMAPIError,
     LLMRateLimitError,
 )
+from prompt_runner.llm.openai_provider import OpenAIProvider
 
 __all__ = [
     "LLMProvider",
@@ -20,4 +21,5 @@ __all__ = [
     "LLMConfigError",
     "LLMAPIError",
     "LLMRateLimitError",
+    "OpenAIProvider",
 ]

@@ -163,7 +163,7 @@ my-prompt-data/
 ### Phase 1: Core Framework
 - [x] Initialize Python project with pyproject.toml
 - [x] Implement LLM abstraction layer (`llm/base.py`)
-- [ ] Implement OpenAI provider with web_search support (`llm/openai_provider.py`)
+- [x] Implement OpenAI provider with web_search support (`llm/openai_provider.py`)
 - [ ] Implement Gmail SMTP delivery (`delivery/email.py`)
 - [ ] Build CLI with `run` command (`cli.py`)
 - [ ] Add YAML config loading with Jinja2 templating (`config.py`)
