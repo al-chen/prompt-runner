@@ -1,0 +1,5 @@
+name: bedtime-story
+prompt: Write a one-sentence bedtime story about a unicorn.
+llm:
+  provider: openai
+  model: gpt-5-nano
