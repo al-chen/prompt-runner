@@ -21,7 +21,7 @@ A personalized daily briefing that aggregates information based on your interest
 
 | Component | Technology | Rationale |
 |-----------|------------|-----------|
-| Language | Python 3.11+ | User requirement, excellent LLM SDK support |
+| Language | Python 3.10+ | User requirement, excellent LLM SDK support |
 | LLM | OpenAI Responses API with `web_search` tool | Strong reasoning models (o3, o4-mini), built-in web search |
 | Scheduling | GitHub Actions | Free (unlimited for public repos, 2000 min/month private) |
 | Email | Gmail SMTP + App Password | Zero cost, simple setup, no third-party services |

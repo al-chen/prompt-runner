@@ -6,7 +6,7 @@ Scheduled prompt runner that sends LLM responses via email. Uses GitHub Actions 
 
 ## Architecture
 
-- **Pluggable providers**: Use abstract base classes (`llm/base.py`, `delivery/base.py`, `persistence/base.py`)
+- **Pluggable providers**: Use abstract base classes (`llm/base.py`, `delivery/base.py`)
 - **Public code + private data**: Framework is public, user configs/data are in a separate private repo
 
 ## Development
@@ -21,7 +21,7 @@ ruff check src/
 
 ## Code Style
 
-- Python 3.11+ with type hints
+- Python 3.10+ with type hints
 - Use dataclasses for data structures
 - Keep implementations simple - avoid over-engineering
 
