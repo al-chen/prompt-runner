@@ -15,9 +15,20 @@ pip install -e .
    export OPENAI_API_KEY=sk-...
    ```
 
-2. Run a sample prompt:
+2. (Optional) Set Gmail credentials for email delivery:
    ```bash
-   prompt-runner run test-prompt --no-deliver
+   export GMAIL_SENDER=your.email@gmail.com
+   export GMAIL_APP_PASSWORD=xxxxxxxxxxxx  # 16-character App Password
+   ```
+
+   To generate an App Password:
+   - Enable 2FA on your Google Account
+   - Go to Google Account → Security → App passwords
+   - Generate a new app password for "Mail"
+
+3. Run a sample prompt:
+   ```bash
+   prompt-runner run test-prompt --no-deliver  # use --no-deliver if Gmail is not configured
    ```
 
 This runs `prompts/test-prompt.yml` and prints the LLM response to stdout.
@@ -80,7 +91,6 @@ interests:
   - AI
   - Python
   - Music
-email: john@example.com
 ```
 
 Profile variables are available in two ways:
