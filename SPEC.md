@@ -166,7 +166,7 @@ my-prompt-data/
 - [x] Implement OpenAI provider with web_search support (`llm/openai_provider.py`)
 - [x] Implement Gmail SMTP delivery (`delivery/email.py`)
 - [x] Build CLI with `run` command (`cli.py`)
-- [ ] Add YAML config loading with Jinja2 templating (`config.py`)
+- [x] Add YAML config loading with Jinja2 templating (`config.py`)
 - [ ] Add example configs (`examples/`)
 
 ### Phase 2: Testing & Documentation

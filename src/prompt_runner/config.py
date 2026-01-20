@@ -1,10 +1,13 @@
 """YAML configuration loading for prompts and profiles."""
 
+import os
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import yaml
+from jinja2 import BaseLoader, Environment, TemplateError, UndefinedError
 
 
 @dataclass
@@ -89,8 +92,50 @@ def load_yaml(path: Path) -> dict[str, Any]:
         raise ConfigError(f"Invalid YAML in {path}: {e}") from e
 
 
-def load_prompt_config(path: Path) -> PromptConfig:
+def load_profile(path: Path) -> dict[str, Any]:
+    """Load profile YAML file."""
+    return load_yaml(path)
+
+
+def build_template_context(profile_data: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Build context with built-ins and profile variables."""
+    now = datetime.now()
+    context = {
+        "current_date": now.strftime("%Y-%m-%d"),
+        "current_time": now.strftime("%H:%M"),
+        "current_datetime": now.isoformat(),
+        "current_weekday": now.strftime("%A"),
+        "env": os.environ,
+        "profile": profile_data or {},
+    }
+    # Flatten profile at top level for convenience
+    if profile_data:
+        for key, value in profile_data.items():
+            if key not in context:
+                context[key] = value
+    return context
+
+
+def render_template(template_str: str, context: dict[str, Any]) -> str:
+    """Render Jinja2 template. Raises ConfigError on failure."""
+    try:
+        env = Environment(loader=BaseLoader(), autoescape=False)
+        template = env.from_string(template_str)
+        return template.render(context)
+    except UndefinedError as e:
+        raise ConfigError(f"Template variable not defined: {e}") from e
+    except TemplateError as e:
+        raise ConfigError(f"Template rendering error: {e}") from e
+
+
+def load_prompt_config(path: Path, profile_path: Path | None = None) -> PromptConfig:
     """Load a prompt configuration from a YAML file.
+
+    Supports Jinja2 templating in YAML files. Template context includes:
+    - current_date, current_time, current_datetime, current_weekday
+    - env (access to environment variables)
+    - profile (profile data if provided)
+    - All top-level profile keys are also available directly
 
     Expected YAML format:
     ```yaml
@@ -111,6 +156,7 @@ def load_prompt_config(path: Path) -> PromptConfig:
 
     Args:
         path: Path to the prompt YAML file.
+        profile_path: Optional path to a profile YAML file for template variables.
 
     Returns:
         PromptConfig object.
@@ -118,7 +164,29 @@ def load_prompt_config(path: Path) -> PromptConfig:
     Raises:
         ConfigError: If the config is invalid.
     """
-    data = load_yaml(path)
+    # Load profile if provided
+    profile_data = load_profile(profile_path) if profile_path else None
+
+    # Build template context
+    context = build_template_context(profile_data)
+
+    # Read raw YAML, render through Jinja2, then parse
+    if not path.exists():
+        raise ConfigError(f"Config file not found: {path}")
+
+    try:
+        with open(path) as f:
+            raw_yaml = f.read()
+    except OSError as e:
+        raise ConfigError(f"Cannot read {path}: {e}") from e
+
+    rendered_yaml = render_template(raw_yaml, context)
+
+    try:
+        data = yaml.safe_load(rendered_yaml)
+        data = data if data else {}
+    except yaml.YAMLError as e:
+        raise ConfigError(f"Invalid YAML in {path}: {e}") from e
 
     if "prompt" not in data:
         raise ConfigError(f"Missing required field 'prompt' in {path}")

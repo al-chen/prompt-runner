@@ -1,0 +1,21 @@
+name: daily-briefing
+prompt: |
+  Today is {{ current_weekday }}, {{ current_date }}.
+
+  Generate a personalized daily briefing for {{ name }} in {{ location }}.
+
+  Include:
+  - Local weather and any notable events in {{ location }}
+  - Recent news related to: {{ interests | join(", ") }}
+  - One interesting fact or tip related to these interests
+system_prompt: |
+  You are a friendly personal assistant providing concise, actionable daily briefings.
+  Keep responses informative but brief - aim for 2-3 short paragraphs.
+llm:
+  provider: openai
+  model: gpt-4o
+  enable_web_search: true
+delivery:
+  provider: email
+  recipients: []
+  subject: "Daily Briefing for {{ current_date }}"

@@ -2,6 +2,7 @@
 
 import os
 import sys
+from pathlib import Path
 
 import click
 from dotenv import load_dotenv
@@ -46,7 +47,8 @@ def run(
     try:
         # Load the prompt configuration
         prompt_path = resolve_prompt_path(prompt_name)
-        config = load_prompt_config(prompt_path)
+        profile_path = Path(profile) if profile else None
+        config = load_prompt_config(prompt_path, profile_path=profile_path)
 
         click.echo(f"Prompt: {config.name}")
         click.echo(f"Model: {config.llm.provider}/{config.llm.model}")
@@ -145,7 +147,8 @@ def validate(prompt_name: str, profile: str | None):
     """Validate a prompt configuration without running it."""
     try:
         prompt_path = resolve_prompt_path(prompt_name)
-        config = load_prompt_config(prompt_path)
+        profile_path = Path(profile) if profile else None
+        config = load_prompt_config(prompt_path, profile_path=profile_path)
 
         click.echo(f"✓ Prompt '{config.name}' is valid")
         click.echo(f"  Model: {config.llm.provider}/{config.llm.model}")
