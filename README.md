@@ -28,10 +28,10 @@ pip install -e .
 
 3. Run a sample prompt:
    ```bash
-   prompt-runner run test-prompt --no-deliver  # use --no-deliver if Gmail is not configured
+   prompt-runner run examples/prompts/daily-briefing.yml --profile examples/profiles/example-profile.yml --no-deliver
    ```
 
-This runs `prompts/test-prompt.yml` and prints the LLM response to stdout.
+This runs the example daily briefing prompt and prints the LLM response to stdout.
 
 ## Usage
 
@@ -58,7 +58,7 @@ prompt-runner list
 prompt-runner validate <prompt-name>
 
 # Run with a profile for personalization
-prompt-runner run <prompt-name> --profile profiles/me.yml
+prompt-runner run <prompt-name> --profile examples/profiles/example-profile.yml
 ```
 
 ## Templating
@@ -80,17 +80,18 @@ Prompt configs support Jinja2 templating for dynamic content. Use `{{ variable }
 Profiles are YAML files containing personal data for template substitution. Pass them with `--profile`:
 
 ```bash
-prompt-runner run daily-briefing --profile profiles/me.yml
+prompt-runner run examples/prompts/daily-briefing.yml --profile examples/profiles/example-profile.yml
 ```
 
-**Profile structure** (`profiles/me.yml`):
+**Profile structure** (`examples/profiles/example-profile.yml`):
 ```yaml
-name: John
-location: San Francisco
+name: Jane
+location: New York
+email: jane@example.com
 interests:
-  - AI
-  - Python
-  - Music
+  - technology
+  - cooking
+  - travel
 ```
 
 Profile variables are available in two ways:
@@ -99,7 +100,7 @@ Profile variables are available in two ways:
 
 ### Example Prompt with Templating
 
-**Prompt** (`prompts/daily-briefing.yml`):
+**Prompt** (`examples/prompts/daily-briefing.yml`):
 ```yaml
 name: daily-briefing
 prompt: |
@@ -122,5 +123,5 @@ delivery:
 
 **Run it:**
 ```bash
-prompt-runner run daily-briefing --profile profiles/me.yml --dry-run
+prompt-runner run examples/prompts/daily-briefing.yml --profile examples/profiles/example-profile.yml --dry-run
 ```

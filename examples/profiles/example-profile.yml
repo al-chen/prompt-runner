@@ -1,0 +1,8 @@
+# Example profile - copy to your own data repo and customize
+name: Jane
+location: New York
+email: jane@example.com
+interests:
+  - technology
+  - cooking
+  - travel

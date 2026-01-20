@@ -1,3 +1,5 @@
+# Example daily briefing prompt with Jinja2 templating
+# Requires a profile with: name, location, interests, email
 name: daily-briefing
 prompt: |
   Today is {{ current_weekday }}, {{ current_date }}.
@@ -17,5 +19,6 @@ llm:
   enable_web_search: true
 delivery:
   provider: email
-  recipients: []
+  recipients:
+    - "{{ email }}"
   subject: "Daily Briefing for {{ current_date }}"

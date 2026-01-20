@@ -167,7 +167,7 @@ my-prompt-data/
 - [x] Implement Gmail SMTP delivery (`delivery/email.py`)
 - [x] Build CLI with `run` command (`cli.py`)
 - [x] Add YAML config loading with Jinja2 templating (`config.py`)
-- [ ] Add example configs (`examples/`)
+- [x] Add example configs (`examples/`)
 
 ### Phase 2: Testing & Documentation
 - [ ] Unit tests for core components
