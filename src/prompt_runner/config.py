@@ -87,7 +87,7 @@ def load_yaml(path: Path) -> dict[str, Any]:
     try:
         with open(path) as f:
             data = yaml.safe_load(f)
-            return data if data else {}
+        return data if data else {}
     except yaml.YAMLError as e:
         raise ConfigError(f"Invalid YAML in {path}: {e}") from e
 
@@ -113,6 +113,7 @@ def build_template_context(profile_data: dict[str, Any] | None = None) -> dict[s
         for key, value in profile_data.items():
             if key not in context:
                 context[key] = value
+
     return context
 
 
@@ -126,6 +127,33 @@ def render_template(template_str: str, context: dict[str, Any]) -> str:
         raise ConfigError(f"Template variable not defined: {e}") from e
     except TemplateError as e:
         raise ConfigError(f"Template rendering error: {e}") from e
+
+
+def render_values(data: Any, context: dict[str, Any]) -> Any:
+    """Recursively render Jinja2 templates in string values.
+
+    This approach renders templates AFTER YAML parsing, so multi-line
+    interpolated values cannot break YAML structure.
+
+    Args:
+        data: Parsed YAML data (dict, list, or scalar).
+        context: Jinja2 template context.
+
+    Returns:
+        Data with all string values rendered through Jinja2.
+    """
+    if isinstance(data, dict):
+        return {k: render_values(v, context) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [render_values(item, context) for item in data]
+    elif isinstance(data, str):
+        # Only render if it contains Jinja2 syntax
+        if "{{" in data or "{%" in data:
+            return render_template(data, context)
+        return data
+    else:
+        # int, float, bool, None - return as-is
+        return data
 
 
 def load_prompt_config(path: Path, profile_path: Path | None = None) -> PromptConfig:
@@ -170,7 +198,8 @@ def load_prompt_config(path: Path, profile_path: Path | None = None) -> PromptCo
     # Build template context
     context = build_template_context(profile_data)
 
-    # Read raw YAML, render through Jinja2, then parse
+    # Parse YAML first, then render Jinja2 in values
+    # This prevents multi-line interpolations from breaking YAML structure
     if not path.exists():
         raise ConfigError(f"Config file not found: {path}")
 
@@ -180,13 +209,14 @@ def load_prompt_config(path: Path, profile_path: Path | None = None) -> PromptCo
     except OSError as e:
         raise ConfigError(f"Cannot read {path}: {e}") from e
 
-    rendered_yaml = render_template(raw_yaml, context)
-
     try:
-        data = yaml.safe_load(rendered_yaml)
+        data = yaml.safe_load(raw_yaml)
         data = data if data else {}
     except yaml.YAMLError as e:
         raise ConfigError(f"Invalid YAML in {path}: {e}") from e
+
+    # Render Jinja2 templates in all string values
+    data = render_values(data, context)
 
     if "prompt" not in data:
         raise ConfigError(f"Missing required field 'prompt' in {path}")
