@@ -19,6 +19,14 @@ from prompt_runner.llm.base import LLMConfig, LLMError
 from prompt_runner.llm.openai_provider import OpenAIProvider
 from prompt_runner.rendering import markdown_to_html
 
+# Instructions appended to system prompt for one-off automated deliveries
+ONE_OFF_DELIVERY_INSTRUCTIONS = """
+IMPORTANT: This is a one-off automated delivery (not a live chat).
+- Provide complete, final answers
+- Do NOT ask follow-up questions or request clarification
+- Do NOT use phrases like "let me know if..." or "reply with..."
+- Include all relevant information in your response"""
+
 
 @click.group()
 @click.version_option()
@@ -57,8 +65,14 @@ def run(
             click.echo("Web search: enabled")
 
         if dry_run:
+            # Show the effective system prompt with one-off delivery instructions
+            if config.system_prompt:
+                effective_system_prompt = config.system_prompt + ONE_OFF_DELIVERY_INSTRUCTIONS
+            else:
+                effective_system_prompt = ONE_OFF_DELIVERY_INSTRUCTIONS.strip()
+
             click.echo("\n--- Dry Run Mode ---")
-            click.echo(f"\nSystem prompt:\n{config.system_prompt or '(none)'}")
+            click.echo(f"\nSystem prompt:\n{effective_system_prompt}")
             click.echo(f"\nPrompt:\n{config.prompt}")
             if config.delivery.recipients:
                 click.echo(f"\nWould deliver to: {', '.join(config.delivery.recipients)}")
@@ -77,9 +91,15 @@ def run(
         else:
             raise ConfigError(f"Unknown LLM provider: {config.llm.provider}")
 
+        # Construct system prompt with one-off delivery instructions
+        if config.system_prompt:
+            system_prompt = config.system_prompt + ONE_OFF_DELIVERY_INSTRUCTIONS
+        else:
+            system_prompt = ONE_OFF_DELIVERY_INSTRUCTIONS.strip()
+
         # Call the LLM
         click.echo("\nCalling LLM...")
-        response = provider.complete(config.prompt, config.system_prompt)
+        response = provider.complete(config.prompt, system_prompt)
 
         click.echo(f"Response received ({response.usage.get('total_tokens', '?')} tokens)")
 
