@@ -165,6 +165,7 @@ my-prompt-data/
 - [x] Implement LLM abstraction layer (`llm/base.py`)
 - [x] Implement OpenAI provider with web_search support (`llm/openai_provider.py`)
 - [x] Implement Gmail SMTP delivery (`delivery/email.py`)
+- [x] Add markdown-to-HTML rendering for email delivery (`rendering.py`)
 - [x] Build CLI with `run` command (`cli.py`)
 - [x] Add YAML config loading with Jinja2 templating (`config.py`)
 - [x] Add example configs (`examples/`)

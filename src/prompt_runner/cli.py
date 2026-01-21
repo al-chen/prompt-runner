@@ -17,6 +17,7 @@ from prompt_runner.delivery.base import DeliveryConfig, DeliveryError
 from prompt_runner.delivery.email import EmailDeliveryProvider
 from prompt_runner.llm.base import LLMConfig, LLMError
 from prompt_runner.llm.openai_provider import OpenAIProvider
+from prompt_runner.rendering import markdown_to_html
 
 
 @click.group()
@@ -135,7 +136,8 @@ def _deliver_response(config, content: str) -> None:
         config=delivery_config,
     )
 
-    result = provider.deliver(content)
+    content_html = markdown_to_html(content)
+    result = provider.deliver(content, content_html)
     if not result.success:
         raise DeliveryError(result.error or "Delivery failed")
 
